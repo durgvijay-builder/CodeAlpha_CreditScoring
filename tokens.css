@@ -1,0 +1,57 @@
+:root {
+  --color-paper: oklch(97.2% 0.007 82);
+  --color-paper-2: oklch(94.4% 0.01 82);
+  --color-paper-3: oklch(91.2% 0.012 82);
+  --color-ink: oklch(18.5% 0.01 82);
+  --color-ink-2: oklch(34% 0.012 82);
+  --color-muted: oklch(48% 0.012 82);
+  --color-rule: oklch(84% 0.01 82);
+  --color-accent: oklch(46% 0.16 252);
+  --color-accent-hover: oklch(41% 0.16 252);
+  --color-accent-ink: oklch(98% 0.005 252);
+  --color-focus: oklch(48% 0.19 252);
+  --color-positive: oklch(44% 0.13 155);
+  --color-positive-paper: oklch(93% 0.03 155);
+  --color-caution: oklch(48% 0.15 45);
+  --color-caution-paper: oklch(93% 0.03 45);
+  --color-error: oklch(48% 0.18 25);
+
+  --font-display: "Instrument Serif", Georgia, serif;
+  --font-body: "Plus Jakarta Sans", system-ui, sans-serif;
+  --font-mono: "JetBrains Mono", ui-monospace, monospace;
+
+  --text-xs: 0.8125rem;
+  --text-sm: 0.9rem;
+  --text-md: 1rem;
+  --text-lg: 1.1875rem;
+  --text-xl: 1.425rem;
+  --text-2xl: 1.75rem;
+  --text-3xl: 2.25rem;
+
+  --space-3xs: 2px;
+  --space-2xs: 4px;
+  --space-xs: 8px;
+  --space-sm: 12px;
+  --space-md: 16px;
+  --space-lg: 24px;
+  --space-xl: 40px;
+  --space-2xl: 64px;
+  --space-3xl: 96px;
+  --space-4xl: 144px;
+
+  --radius-sm: 4px;
+  --radius-input: 6px;
+  --radius-card: 8px;
+
+  --dur-micro: 120ms;
+  --dur-short: 220ms;
+  --dur-long: 420ms;
+  --ease-out: cubic-bezier(0.22, 1, 0.36, 1);
+  --ease-in-out: cubic-bezier(0.65, 0, 0.35, 1);
+
+  --z-base: 1;
+  --z-raised: 10;
+  --z-sticky: 200;
+  --z-sticky-nav: 300;
+  --z-toast: 500;
+}

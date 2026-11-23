@@ -1,0 +1,467 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Loan Underwriting Workbench</title>
+  <meta name="description" content="Credit scoring and loan eligibility evaluation workbench built on 614 historical loan applications.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif&family=Plus+Jakarta+Sans:wght@400;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="./style.css">
+</head>
+<body>
+  <a class="skip" href="#main">Skip to content</a>
+
+  <div class="shell">
+    <header class="topbar">
+      <div class="topbar__brand">
+        <a class="wordmark" href="#main" aria-label="Loan Underwriting Workbench home">Underwriting Ledger</a>
+        <span class="topbar__meta">CodeAlpha Task 1, 614 historical records, Customer_ID excluded</span>
+      </div>
+      <div class="preset-bar" role="group" aria-label="Sample applicant profiles">
+        <span class="preset-bar__label">Load applicant profile:</span>
+        <button type="button" class="btn btn--quiet" data-preset="prime" aria-pressed="true">Semiurban graduate</button>
+        <button type="button" class="btn btn--quiet" data-preset="thin" aria-pressed="false">No credit history</button>
+        <button type="button" class="btn btn--quiet" data-preset="highratio" aria-pressed="false">High loan-to-income</button>
+      </div>
+    </header>
+
+    <main id="main">
+      <section class="stats-strip" aria-label="Dataset summary statistics">
+        <div class="stat-cell">
+          <b class="stat-cell__value">614</b>
+          <span class="stat-cell__label">Applications evaluated (422 approved, 192 rejected)</span>
+        </div>
+        <div class="stat-cell">
+          <b class="stat-cell__value">78.9%</b>
+          <span class="stat-cell__label">Approval rate when credit history is met (412 of 522)</span>
+        </div>
+        <div class="stat-cell">
+          <b class="stat-cell__value">10.9%</b>
+          <span class="stat-cell__label">Approval rate without prior credit history (10 of 92)</span>
+        </div>
+        <div class="stat-cell">
+          <b class="stat-cell__value">76.8%</b>
+          <span class="stat-cell__label">Highest approval share by property area (Semiurban)</span>
+        </div>
+      </section>
+
+      <section class="workbench" aria-labelledby="workbench-heading">
+        <div>
+          <div class="section-head">
+            <h1 id="workbench-heading">Evaluate a loan application</h1>
+            <p>Enter the 11 applicant attributes below to compute approval probability through the preprocessing pipeline.</p>
+          </div>
+
+          <form id="underwritingForm" novalidate>
+            <div class="form-grid">
+              <div class="field">
+                <label for="Credit_History">Credit history</label>
+                <select id="Credit_History" name="Credit_History" class="input">
+                  <option value="1" selected>1 (Guidelines met)</option>
+                  <option value="0">0 (No documented history)</option>
+                </select>
+                <span class="field__help" id="help-Credit_History">Primary driver across all 3 classifiers.</span>
+              </div>
+
+              <div class="field">
+                <label for="Property_Area">Property area</label>
+                <select id="Property_Area" name="Property_Area" class="input">
+                  <option value="Semiurban" selected>Semiurban (76.8% historical approval)</option>
+                  <option value="Urban">Urban (65.8% historical approval)</option>
+                  <option value="Rural">Rural (61.5% historical approval)</option>
+                </select>
+                <span class="field__help">Location classification of the collateral property.</span>
+              </div>
+
+              <div class="field">
+                <label for="Applicant_Income">Applicant monthly income</label>
+                <input id="Applicant_Income" name="Applicant_Income" type="number" inputmode="decimal" min="150" max="81000" value="5468" class="input" required>
+                <span class="field__help" id="help-Applicant_Income">Dataset range: 150 to 81,000.</span>
+              </div>
+
+              <div class="field">
+                <label for="Coapplicant_Income">Coapplicant monthly income</label>
+                <input id="Coapplicant_Income" name="Coapplicant_Income" type="number" inputmode="decimal" min="0" max="42000" value="1032" class="input" required>
+                <span class="field__help" id="help-Coapplicant_Income">Enter 0 if applying individually.</span>
+              </div>
+
+              <div class="field">
+                <label for="Loan_Amount">Requested loan amount (thousands)</label>
+                <input id="Loan_Amount" name="Loan_Amount" type="number" inputmode="decimal" min="9" max="700" value="128" class="input" required>
+                <span class="field__help" id="help-Loan_Amount">Dataset range: 9 to 700 thousand.</span>
+              </div>
+
+              <div class="field">
+                <label for="Loan_Amount_Term">Repayment term (months)</label>
+                <select id="Loan_Amount_Term" name="Loan_Amount_Term" class="input">
+                  <option value="360" selected>360 months (30 years)</option>
+                  <option value="180">180 months (15 years)</option>
+                  <option value="120">120 months (10 years)</option>
+                  <option value="240">240 months (20 years)</option>
+                  <option value="480">480 months (40 years)</option>
+                </select>
+                <span class="field__help">Standard contract duration in months.</span>
+              </div>
+
+              <div class="field">
+                <label for="Education">Education level</label>
+                <select id="Education" name="Education" class="input">
+                  <option value="Graduate" selected>Graduate (70.8% historical approval)</option>
+                  <option value="Not Graduate">Not Graduate (61.2% historical approval)</option>
+                </select>
+                <span class="field__help">Applicant academic completion status.</span>
+              </div>
+
+              <div class="field">
+                <label for="Married">Marital status</label>
+                <select id="Married" name="Married" class="input">
+                  <option value="Yes" selected>Yes (71.7% historical approval)</option>
+                  <option value="No">No (63.3% historical approval)</option>
+                </select>
+                <span class="field__help">Joint household indicator.</span>
+              </div>
+
+              <div class="field">
+                <label for="Dependents">Number of dependents</label>
+                <select id="Dependents" name="Dependents" class="input">
+                  <option value="0">0 dependents</option>
+                  <option value="1" selected>1 dependent</option>
+                  <option value="2">2 dependents</option>
+                  <option value="3">3 or more dependents</option>
+                </select>
+                <span class="field__help">Household members supported by income.</span>
+              </div>
+
+              <div class="field">
+                <label for="Self_Employed">Self-employed</label>
+                <select id="Self_Employed" name="Self_Employed" class="input">
+                  <option value="No" selected>No (Salaried)</option>
+                  <option value="Yes">Yes (Self-employed)</option>
+                </select>
+                <span class="field__help">Primary employment structure.</span>
+              </div>
+
+              <div class="field">
+                <label for="Gender">Gender</label>
+                <select id="Gender" name="Gender" class="input">
+                  <option value="Male" selected>Male</option>
+                  <option value="Female">Female</option>
+                </select>
+                <span class="field__help">Recorded demographic attribute.</span>
+              </div>
+            </div>
+
+            <div class="form-actions">
+              <span id="formStatus" class="topbar__meta" role="status" aria-live="polite">Ready to score application.</span>
+              <button type="submit" id="scoreBtn" class="btn">Score application</button>
+            </div>
+          </form>
+        </div>
+
+        <aside class="verdict-well" aria-labelledby="verdict-title">
+          <div class="verdict-header">
+            <div>
+              <h2 id="verdict-title" class="verdict-decision">Approved (Y)</h2>
+              <p id="verdictSub" class="topbar__meta">Logistic Regression pipeline estimate</p>
+            </div>
+            <span id="verdictChip" class="verdict-chip verdict-chip--approved">84.2% approval probability</span>
+          </div>
+
+          <div class="chart-block">
+            <h3>Applicant probability vs cohort baseline rates</h3>
+            <svg class="bar-svg" viewBox="0 0 420 155" role="img" aria-label="Horizontal bar chart comparing current applicant probability against historical credit history cohorts">
+              <line x1="150" y1="15" x2="150" y2="135" stroke="currentColor" stroke-opacity="0.18" />
+              <line x1="215" y1="15" x2="215" y2="135" stroke="currentColor" stroke-opacity="0.14" />
+              <line x1="280" y1="15" x2="280" y2="135" stroke="currentColor" stroke-opacity="0.14" />
+              <line x1="345" y1="15" x2="345" y2="135" stroke="currentColor" stroke-opacity="0.14" />
+              <line x1="410" y1="15" x2="410" y2="135" stroke="currentColor" stroke-opacity="0.18" />
+
+              <text x="0" y="38" font-size="12" fill="currentColor">Current applicant</text>
+              <rect id="svgApplicantBar" x="150" y="24" width="219" height="20" rx="2" fill="var(--color-accent)" />
+              <text id="svgApplicantText" x="375" y="39" font-size="12" font-weight="600" fill="currentColor">84.2%</text>
+
+              <text x="0" y="78" font-size="12" fill="currentColor">Credit history = 1</text>
+              <rect x="150" y="64" width="205" height="20" rx="2" fill="var(--color-muted)" fill-opacity="0.45" />
+              <text x="361" y="79" font-size="12" fill="currentColor">78.9%</text>
+
+              <text x="0" y="118" font-size="12" fill="currentColor">Credit history = 0</text>
+              <rect x="150" y="104" width="28" height="20" rx="2" fill="var(--color-muted)" fill-opacity="0.45" />
+              <text x="184" y="119" font-size="12" fill="currentColor">10.9%</text>
+            </svg>
+          </div>
+
+          <dl class="factor-list" aria-label="Derived financial ratios">
+            <div class="factor-row">
+              <dt>Combined monthly household income</dt>
+              <dd id="ratioTotalIncome" class="num">6,500</dd>
+            </div>
+            <div class="factor-row">
+              <dt>Loan amount to monthly income multiple</dt>
+              <dd id="ratioMultiple" class="num">19.7x</dd>
+            </div>
+            <div class="factor-row">
+              <dt>Estimated monthly installment (principal / term)</dt>
+              <dd id="ratioInstallment" class="num">356 / month</dd>
+            </div>
+            <div class="factor-row">
+              <dt>Primary decision factor</dt>
+              <dd id="ratioDriver">Credit history guidelines met</dd>
+            </div>
+          </dl>
+        </aside>
+      </section>
+
+      <section class="split-section" aria-label="Model comparison and historical ledger">
+        <div>
+          <div class="section-head">
+            <h2>Pipeline benchmark (80/20 stratified split)</h2>
+            <p>All three classifiers share the same ColumnTransformer: median imputation and scaling on numbers, one-hot encoding on categories.</p>
+          </div>
+
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th scope="col">Classifier</th>
+                <th scope="col">Accuracy</th>
+                <th scope="col">Precision</th>
+                <th scope="col">Recall</th>
+                <th scope="col">F1</th>
+                <th scope="col">ROC-AUC</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>Logistic Regression</td>
+                <td>0.8049</td>
+                <td>0.8020</td>
+                <td>0.9529</td>
+                <td>0.8710</td>
+                <td>0.8012</td>
+              </tr>
+              <tr>
+                <td>Random Forest (200 trees)</td>
+                <td>0.7805</td>
+                <td>0.7959</td>
+                <td>0.9176</td>
+                <td>0.8525</td>
+                <td>0.7861</td>
+              </tr>
+              <tr>
+                <td>Decision Tree (max_depth=5)</td>
+                <td>0.8049</td>
+                <td>0.8144</td>
+                <td>0.9294</td>
+                <td>0.8681</td>
+                <td>0.6735</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div>
+          <div class="table-toolbar">
+            <div class="section-head" style="margin-bottom: 0">
+              <h2>Historical application ledger</h2>
+              <p>Sample records from Loan Eligibility Prediction.csv</p>
+            </div>
+            <div class="filter-row">
+              <label for="ledgerFilter" class="topbar__meta">Filter status:</label>
+              <select id="ledgerFilter" class="input">
+                <option value="ALL">All statuses</option>
+                <option value="Y">Approved (Y)</option>
+                <option value="N">Rejected (N)</option>
+              </select>
+            </div>
+          </div>
+
+          <div id="ledgerContainer">
+            <table class="data-table" id="ledgerTable">
+              <thead>
+                <tr>
+                  <th scope="col">Education</th>
+                  <th scope="col">Area</th>
+                  <th scope="col">Income</th>
+                  <th scope="col">Loan (k)</th>
+                  <th scope="col">Credit hist.</th>
+                  <th scope="col">Status</th>
+                </tr>
+              </thead>
+              <tbody id="ledgerBody"></tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <footer class="colophon">
+      <span>CodeAlpha Machine Learning Internship, Task 1 Credit Scoring</span>
+      <span>Educational pipeline demonstration; not a commercial lending decision system.</span>
+    </footer>
+  </div>
+
+  <script>
+    const PRESETS = {
+      prime: {
+        Credit_History: "1", Property_Area: "Semiurban", Applicant_Income: 5468,
+        Coapplicant_Income: 1032, Loan_Amount: 128, Loan_Amount_Term: "360",
+        Education: "Graduate", Married: "Yes", Dependents: "1", Self_Employed: "No", Gender: "Male"
+      },
+      thin: {
+        Credit_History: "0", Property_Area: "Urban", Applicant_Income: 3200,
+        Coapplicant_Income: 0, Loan_Amount: 115, Loan_Amount_Term: "360",
+        Education: "Graduate", Married: "No", Dependents: "0", Self_Employed: "No", Gender: "Female"
+      },
+      highratio: {
+        Credit_History: "1", Property_Area: "Rural", Applicant_Income: 2378,
+        Coapplicant_Income: 0, Loan_Amount: 310, Loan_Amount_Term: "180",
+        Education: "Not Graduate", Married: "No", Dependents: "2", Self_Employed: "Yes", Gender: "Male"
+      }
+    };
+
+    const SAMPLE_LEDGER = [
+      { Education: "Graduate", Property_Area: "Semiurban", Applicant_Income: 5468, Coapplicant_Income: 1032, Loan_Amount: 26, Credit_History: 1, Loan_Status: "Y" },
+      { Education: "Graduate", Property_Area: "Urban", Applicant_Income: 2378, Coapplicant_Income: 0, Loan_Amount: 9, Credit_History: 1, Loan_Status: "N" },
+      { Education: "Not Graduate", Property_Area: "Semiurban", Applicant_Income: 3620, Coapplicant_Income: 0, Loan_Amount: 25, Credit_History: 1, Loan_Status: "Y" },
+      { Education: "Graduate", Property_Area: "Urban", Applicant_Income: 1299, Coapplicant_Income: 1086, Loan_Amount: 17, Credit_History: 1, Loan_Status: "Y" },
+      { Education: "Not Graduate", Property_Area: "Semiurban", Applicant_Income: 2600, Coapplicant_Income: 1911, Loan_Amount: 116, Credit_History: 0, Loan_Status: "N" },
+      { Education: "Graduate", Property_Area: "Rural", Applicant_Income: 4583, Coapplicant_Income: 1508, Loan_Amount: 128, Credit_History: 1, Loan_Status: "N" },
+      { Education: "Graduate", Property_Area: "Semiurban", Applicant_Income: 3036, Coapplicant_Income: 2504, Loan_Amount: 158, Credit_History: 0, Loan_Status: "N" }
+    ];
+
+    function renderLedger(filterValue) {
+      const container = document.getElementById("ledgerContainer");
+      const rows = SAMPLE_LEDGER.filter(r => filterValue === "ALL" || r.Loan_Status === filterValue);
+      if (rows.length === 0) {
+        container.innerHTML = '<div class="state-panel">No applications match this filter. Reset the filter to view all records.</div>';
+        return;
+      }
+      const tbodyHtml = rows.map(r => `
+        <tr>
+          <td>${r.Education}</td>
+          <td>${r.Property_Area}</td>
+          <td>${(r.Applicant_Income + r.Coapplicant_Income).toLocaleString()}</td>
+          <td>${r.Loan_Amount}</td>
+          <td>${r.Credit_History}</td>
+          <td><strong>${r.Loan_Status}</strong></td>
+        </tr>
+      `).join("");
+      const bodyEl = document.getElementById("ledgerBody");
+      if (bodyEl) {
+        bodyEl.innerHTML = tbodyHtml;
+      }
+    }
+
+    async function evaluateCurrentForm() {
+      const form = document.getElementById("underwritingForm");
+      const incomeInput = document.getElementById("Applicant_Income");
+      const loanInput = document.getElementById("Loan_Amount");
+      const statusText = document.getElementById("formStatus");
+
+      const incomeVal = Number(incomeInput.value);
+      const loanVal = Number(loanInput.value);
+
+      if (!incomeVal || incomeVal < 100) {
+        incomeInput.setAttribute("aria-invalid", "true");
+        document.getElementById("help-Applicant_Income").textContent = "Enter an applicant income of at least 100.";
+        document.getElementById("help-Applicant_Income").classList.add("field__help--error");
+        incomeInput.focus();
+        return;
+      }
+      incomeInput.removeAttribute("aria-invalid");
+      document.getElementById("help-Applicant_Income").textContent = "Dataset range: 150 to 81,000.";
+      document.getElementById("help-Applicant_Income").classList.remove("field__help--error");
+
+      if (!loanVal || loanVal < 5) {
+        loanInput.setAttribute("aria-invalid", "true");
+        document.getElementById("help-Loan_Amount").textContent = "Enter a loan amount of at least 5 thousand.";
+        document.getElementById("help-Loan_Amount").classList.add("field__help--error");
+        loanInput.focus();
+        return;
+      }
+      loanInput.removeAttribute("aria-invalid");
+      document.getElementById("help-Loan_Amount").textContent = "Dataset range: 9 to 700 thousand.";
+      document.getElementById("help-Loan_Amount").classList.remove("field__help--error");
+
+      const fields = ["Credit_History", "Property_Area", "Applicant_Income", "Coapplicant_Income", "Loan_Amount", "Loan_Amount_Term", "Education", "Married", "Dependents", "Self_Employed", "Gender"];
+      const payload = {};
+      fields.forEach(f => {
+        const el = document.getElementById(f);
+        payload[f] = el.type === "number" ? Number(el.value) : el.value;
+      });
+
+      let result;
+      try {
+        const res = await fetch("/predict", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(payload)
+        });
+        if (!res.ok) throw new Error("bad response");
+        result = await res.json();
+      } catch (_) {
+        statusText.textContent = "Model server not reachable. Start it with: python main.py";
+        return;
+      }
+
+      const probPct = (result.probability * 100).toFixed(1);
+      const approved = result.Loan_Status === "Y" || result.Loan_Status === "Approved";
+      const titleEl = document.getElementById("verdict-title");
+      const chipEl = document.getElementById("verdictChip");
+
+      titleEl.textContent = approved ? "Approved (Y)" : "Rejected (N)";
+      chipEl.textContent = `${probPct}% approval probability`;
+      chipEl.className = approved
+        ? "verdict-chip verdict-chip--approved"
+        : "verdict-chip verdict-chip--rejected";
+
+      const barWidth = Math.max(4, Math.min(260, Math.round(result.probability * 260)));
+      document.getElementById("svgApplicantBar").setAttribute("width", String(barWidth));
+      document.getElementById("svgApplicantText").setAttribute("x", String(156 + barWidth));
+      document.getElementById("svgApplicantText").textContent = `${probPct}%`;
+
+      const totalIncome = Number(payload.Applicant_Income) + Number(payload.Coapplicant_Income);
+      const multiple = (Number(payload.Loan_Amount) / Math.max(1, totalIncome / 1000)).toFixed(1);
+      const installment = Math.round((Number(payload.Loan_Amount) * 1000) / Number(payload.Loan_Amount_Term));
+
+      document.getElementById("ratioTotalIncome").textContent = totalIncome.toLocaleString();
+      document.getElementById("ratioMultiple").textContent = `${multiple}x monthly`;
+      document.getElementById("ratioInstallment").textContent = `${installment.toLocaleString()} / month`;
+      document.getElementById("ratioDriver").textContent = Number(payload.Credit_History) === 1
+        ? "Credit history guidelines met (+78.9% cohort base)"
+        : "Missing credit history (10.9% cohort base)";
+
+      statusText.textContent = `Scored application (${probPct}% approval probability).`;
+    }
+
+    document.querySelectorAll("[data-preset]").forEach(btn => {
+      btn.addEventListener("click", () => {
+        document.querySelectorAll("[data-preset]").forEach(b => b.setAttribute("aria-pressed", "false"));
+        btn.setAttribute("aria-pressed", "true");
+        const preset = PRESETS[btn.dataset.preset];
+        Object.entries(preset).forEach(([k, v]) => {
+          const el = document.getElementById(k);
+          if (el) el.value = String(v);
+        });
+        const url = new URL(window.location);
+        url.searchParams.set("preset", btn.dataset.preset);
+        window.history.replaceState({}, "", url);
+        evaluateCurrentForm();
+      });
+    });
+
+    document.getElementById("underwritingForm").addEventListener("submit", (e) => {
+      e.preventDefault();
+      evaluateCurrentForm();
+    });
+
+    document.getElementById("ledgerFilter").addEventListener("change", (e) => {
+      renderLedger(e.target.value);
+    });
+
+    renderLedger("ALL");
+    evaluateCurrentForm();
+  </script>
+</body>
+</html>
